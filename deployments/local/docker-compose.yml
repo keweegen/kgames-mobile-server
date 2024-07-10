@@ -1,0 +1,41 @@
+volumes:
+  data-pg:
+    name: ${APP_NAME}-data-pg
+
+services:
+  app:
+    image: alpine:3.20
+    container_name: ${APP_NAME}-app
+    working_dir: /app
+    command: "/app/server"
+    ports:
+      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - REDIS_ADDRESS=redis:6379
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ../../bin:/app
+    env_file:
+      - .env
+
+  postgres:
+    image: ${POSTGRES_IMAGE}
+    container_name: ${APP_NAME}-postgres
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    volumes:
+      - data-pg:/var/lib/postgresql/data
+
+  redis:
+    image: ${REDIS_IMAGE}
+    container_name: ${APP_NAME}-redis
+    ports:
+      - "${REDIS_PORT}:6379"

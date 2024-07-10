@@ -1,0 +1,35 @@
+output = "internal/db/model"
+pkgname = "model"
+wipe = true
+no-tests = true
+
+[psql]
+dbname = "dbname"
+host = "localhost"
+port = 5432
+user = "dbusername"
+pass = "dbpassword"
+schema = "myschema"
+sslmode = "disable"
+blacklist = ["migrations"]
+
+[[types]]
+[types.match]
+type = "types.Decimal"
+
+[types.replace]
+type = "decimal.Decimal"
+
+[types.imports]
+third_party = ['"github.com/shopspring/decimal"']
+
+[[types]]
+[types.match]
+type = "types.NullDecimal"
+nullable = true
+
+[types.replace]
+type = "decimal.NullDecimal"
+
+[types.imports]
+third_party = ['"github.com/shopspring/decimal"']

@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+package user;
+
+option go_package = "./;userpb";
+
+service Service {
+  rpc Create(CreateRequest) returns (Response);
+  rpc Get(GetRequest) returns (Response);
+  rpc Update(UpdateRequest) returns (Response);
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+}
+
+message Response {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string locale = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message CreateRequest {
+  string name = 1;
+  string email = 2;
+  string locale = 3;
+}
+
+message GetRequest {
+  string id = 1;
+}
+
+message UpdateRequest {
+  string id = 1;
+  string name = 2;
+  string locale = 3;
+}
+
+message DeleteRequest {
+  string id = 1;
+}

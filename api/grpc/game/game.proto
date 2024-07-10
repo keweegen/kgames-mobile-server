@@ -1,0 +1,131 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+package game;
+
+option go_package = "./;gamepb";
+
+service Service {
+  rpc CreateGame(CreateGameRequest) returns (GameResponse) {}
+  rpc GameStreaming(stream StreamRequest) returns (stream StreamResponse) {}
+}
+
+enum State {
+  S_UNKNOWN = 0;
+  S_CREATED = 1;
+  S_ACTIVE = 2;
+  S_FINISHED = 3;
+}
+
+message CreateGameRequest {
+  string initiator_id = 1;
+  Type type = 2;
+  double bid = 3;
+  int32 max_players = 4;
+}
+
+message GameResponse {
+  string id = 1;
+  Type type = 2;
+  State state_code = 3;
+  double bid = 4;
+  int32 max_players = 5;
+  FinishReason finish_reason = 6;
+  repeated GamePlayerResponse players = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp started_at = 9;
+  google.protobuf.Timestamp finished_at = 10;
+}
+
+message GamePlayerResponse {
+  string id = 1;
+  int32 position = 2;
+}
+
+message StreamRequest {
+  string game_id = 1;
+  string user_id = 2;
+  StreamAction action = 3;
+  google.protobuf.Any data = 4;
+}
+
+message StreamResponse {
+  bool ok = 1;
+  string description = 2;
+  string game_id = 3;
+  string user_id = 4;
+  StreamAction action = 5;
+  google.protobuf.Any data = 6;
+}
+
+enum Type {
+  T_UNKNOWN = 0;
+  T_TIC_TAC_TOE = 1;
+}
+
+enum UnitCode {
+  UC_UNKNOWN = 0;
+  UC_TIC_TAC_TOE_X = 1;
+  UC_TIC_TAC_TOE_O = 2;
+}
+
+enum StreamAction {
+  SA_UNKNOWN = 0;
+  SA_PLAYER_CONNECT = 1;
+  SA_PLAYER_READY = 2;
+  SA_PLAYER_MOVE = 3;
+  SA_PLAYER_TIMEOUT = 4;
+  SA_PLAYER_DRAW = 5;
+  SA_PLAYER_GAVE_UP = 6;
+  SA_PLAYER_DISCONNECT = 7;
+  SA_GAME_START = 8;
+  SA_GAME_FINISH = 9;
+}
+
+message StreamData {
+  StreamAction action = 1;
+  google.protobuf.Any data = 2;
+  google.protobuf.Timestamp ts = 3;
+}
+
+message GameStartResponse {}
+
+message PlayerResponse {
+  string player_id = 2;
+}
+
+message PlayerMoveResponse {
+  string striker_id = 1;
+  string batter_id = 2;
+  UnitCode unit_code = 3;
+  PlayerMovePosition position = 4;
+}
+
+message PlayerMovePosition {
+  int32 index = 1;
+  int32 x = 2;
+  int32 y = 3;
+}
+
+message FinishPlayer {
+  string player_id = 1;
+  string profit = 2;
+  string fee = 3;
+  bool draw = 4;
+  bool gave_up = 5;
+}
+
+enum FinishReason {
+  FR_UNKNOWN = 0;
+  FR_DEFAULT = 1;
+  FR_DRAW = 2;
+  FR_GAVE_UP = 3;
+  FR_INVALID = 4;
+}
+
+message GameFinishResponse {
+  FinishReason reason = 1;
+  repeated FinishPlayer players = 2;
+}
